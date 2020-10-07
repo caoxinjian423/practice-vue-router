@@ -1,23 +1,41 @@
 import Vue from 'vue'
 import VueRouter from 'vue-router'
 import Home from '../views/Home.vue'
+import InfoDetails from "@/views/InfoDetails.vue";
+import NotFound from "@/views/NotFound.vue";
+import SecretDetails from "@/views/SecretDetails.vue";
 
 Vue.use(VueRouter)
 
 const routes = [
   {
-    path: '/',
-    name: 'Home',
-    component: Home
+    path: "/",
+    name: "home",
+    component: Home,
   },
   {
-    path: '/about',
-    name: 'About',
-    // route level code-splitting
-    // this generates a separate chunk (about.[hash].js) for this route
-    // which is lazy-loaded when the route is visited.
-    component: () => import(/* webpackChunkName: "about" */ '../views/About.vue')
-  }
+    path: "/infos/:infoId",
+    name: "InfoDetails",
+    component: InfoDetails,
+    props: true,
+    children: [
+      {
+        path: ":secret",
+        name: "secretDetails",
+        component: SecretDetails,
+        props: true,
+        meta: {
+          details: "不要告诉别人",
+        },
+      },
+    ],
+  },
+  {
+    path: "/404",
+    alias: "*",
+    name: "NotFound",
+    component: NotFound,
+  },
 ]
 
 const router = new VueRouter({
@@ -25,5 +43,13 @@ const router = new VueRouter({
   base: process.env.BASE_URL,
   routes
 })
+
+router.beforeEach((to, from, next) => {
+  if (to.name === "secretDetails") {
+    alert(to.meta.details);
+  }
+
+  next();
+});
 
 export default router
